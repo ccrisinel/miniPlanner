@@ -113,9 +113,13 @@ Backing up means copying the SQLite file.
 - **Move a card**: drag it. The new order is saved immediately. Grab the card by its
   margins — titles and lines stay clickable.
 
-In every field, `Enter` confirms and `Esc` cancels. Clicking away also confirms:
-what you filled in is saved, what you left empty is dropped (a card just created and
-left untitled disappears on its own).
+In every field, `Enter` confirms and `Esc` cancels. `Shift+Enter` inserts a line
+break instead of confirming, in card titles as well as task lines. Clicking away also
+confirms: what you filled in is saved, what you left empty is dropped (a card just
+created and left untitled disappears on its own).
+
+Long text wraps onto as many lines as it needs and the card grows accordingly —
+nothing is ever cut off.
 
 Note that the interface itself is in French.
 

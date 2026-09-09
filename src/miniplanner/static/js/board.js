@@ -71,6 +71,29 @@
         });
     }
 
+    // A textarea grows with its content, and keeps Enter as "confirm";
+    // Shift+Enter inserts a line break instead.
+    function armTextareas(root) {
+        selfAndDescendants(root, "textarea[data-commit]").forEach(function (field) {
+            if (field.textareaArmed) return;
+            field.textareaArmed = true;
+
+            function fitToContent() {
+                field.style.height = "auto";
+                field.style.height = field.scrollHeight + "px";
+            }
+
+            field.addEventListener("input", fitToContent);
+            field.addEventListener("keydown", function (evt) {
+                if (evt.key === "Enter" && !evt.shiftKey) {
+                    evt.preventDefault();
+                    field.form.requestSubmit();
+                }
+            });
+            fitToContent();
+        });
+    }
+
     function focusPending(root) {
         var field = selfAndDescendants(root, "[data-autofocus]")[0];
         if (!field) return;
@@ -81,6 +104,7 @@
     function process(root) {
         initSortable(root);
         armCommitOnBlur(root);
+        armTextareas(root);
         focusPending(root);
     }
 

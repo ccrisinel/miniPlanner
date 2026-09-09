@@ -13,7 +13,7 @@
             </form>
         {% else %}
             <button hx-get="/people/{{ person.id }}/edit" hx-target="#board" hx-swap="innerHTML"
-                    class="max-w-full truncate text-lg hover:text-white">{{ person.name }}</button>
+                    class="max-w-full break-words text-lg hover:text-white">{{ person.name }}</button>
             <button hx-delete="/people/{{ person.id }}" hx-target="#board" hx-swap="innerHTML"
                     hx-confirm="Supprimer {{ person.name }} et toutes ses cartes ?"
                     aria-label="Supprimer {{ person.name }}"
@@ -33,11 +33,12 @@
             <form hx-post="/people/{{ person.id }}/cards"
                   hx-target="#column-{{ person.id }}" hx-swap="outerHTML"
                   class="flex h-36 flex-col rounded-2xl border border-line/70 px-4 py-3">
-                <input name="title" data-autofocus data-commit autocomplete="off" placeholder="titre"
-                       hx-get="/columns/{{ person.id }}" hx-trigger="keyup[key=='Escape']"
-                       hx-target="#column-{{ person.id }}" hx-swap="outerHTML"
-                       class="w-full bg-transparent pb-2 text-center
-                              placeholder:text-line/40 focus:outline-none">
+                <textarea name="title" rows="1" data-autofocus data-commit placeholder="titre"
+                          hx-get="/columns/{{ person.id }}" hx-trigger="keyup[key=='Escape']"
+                          hx-target="#column-{{ person.id }}" hx-swap="outerHTML"
+                          class="w-full resize-none overflow-hidden bg-transparent pb-2
+                                 text-center placeholder:text-line/40
+                                 focus:outline-none"></textarea>
                 <span class="border-t border-line/70"></span>
             </form>
         {% else %}
