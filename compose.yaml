@@ -1,7 +1,7 @@
 services:
   miniplanner:
+    image: ghcr.io/ccrisinel/miniplanner:latest
     build: .
-    image: miniplanner
     restart: unless-stopped
     ports:
       - "8000:8000"

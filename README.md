@@ -56,23 +56,31 @@ network you trust.
 
 ## Docker
 
-The image runs gunicorn — not the development server — as an unprivileged user:
+Images are published to the GitHub Container Registry for `linux/amd64` and
+`linux/arm64` on every push to `main`, so there is nothing to build:
 
 ```bash
-docker compose up -d          # http://localhost:8000
+docker run -d -p 8000:8000 -v planner-data:/data \
+  ghcr.io/ccrisinel/miniplanner:latest
 ```
 
+Or through compose, which is what `compose.yaml` describes:
+
+```bash
+docker compose pull && docker compose up -d     # http://localhost:8000
+```
+
+`latest` follows `main`, `sha-<short>` pins a single commit, and pushing a `v*` git
+tag publishes that version. To build the image yourself rather than pull it, run
+`docker compose up -d --build`.
+
+The image runs gunicorn — not the development server — as an unprivileged user.
 The board lives in a `planner-data` volume mounted at `/data`; backing up means
-copying `planner.db` out of it. Without compose:
+copying `planner.db` out of it.
 
-```bash
-docker build -t miniplanner .
-docker run -d -p 8000:8000 -v planner-data:/data miniplanner
-```
-
-Built in two stages on `python:3.13-alpine`, the image is around 24 MB compressed
-and 37 MB on disk. It ships two gthread workers, which suits a small team; override
-the command to change that:
+Built in two stages on `python:3.13-alpine`, it weighs around 24 MB compressed and
+37 MB on disk. It ships two gthread workers, which suits a small team; override the
+command to change that:
 
 ```bash
 docker run -p 8000:8000 -v planner-data:/data miniplanner \
