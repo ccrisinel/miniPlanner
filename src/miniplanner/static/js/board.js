@@ -1,8 +1,8 @@
-// Deplacement des cartes (SortableJS) + focus des champs rendus par htmx.
+// Card drag and drop (SortableJS), plus focus for fields rendered by htmx.
 (function () {
     "use strict";
 
-    // Etat complet du tableau : "personId:cardId,cardId;personId:cardId"
+    // Whole board state: "personId:cardId,cardId;personId:cardId"
     function boardState() {
         return Array.from(document.querySelectorAll("[data-cards]"))
             .map(function (list) {
@@ -30,7 +30,7 @@
             new Sortable(list, {
                 group: "cards",
                 animation: 150,
-                // les controles restent cliquables, on tire la carte par ses marges
+                // controls stay clickable; a card is dragged by its margins
                 filter: "button, input, textarea, form",
                 preventOnFilter: false,
                 ghostClass: "card-ghost",
@@ -39,15 +39,16 @@
         });
     }
 
-    // Cliquer ailleurs vaut validation : on soumet ce qui est rempli, on abandonne ce
-    // qui est vide (la carte en cours de creation disparait alors d'elle-meme).
+    // Clicking away confirms: submit what was filled in, drop what is empty (a
+    // card being created then disappears on its own).
     function armCommitOnBlur(root) {
         selfAndDescendants(root, "[data-commit]").forEach(function (input) {
             if (input.commitArmed || !input.form) return;
             input.commitArmed = true;
             var form = input.form;
 
-            // Entree et Echap passent deja par htmx : ne pas rejouer au blur qui suit.
+            // Enter and Esc already go through htmx: do not replay on the blur
+            // that follows.
             form.addEventListener("htmx:before:request", function () { input.done = true; });
             input.addEventListener("focus", function () { input.done = false; });
 
@@ -58,7 +59,7 @@
                     form.requestSubmit();
                     return;
                 }
-                // vide : on rejoue l'annulation deja decrite pour Echap, s'il y en a une
+                // empty: replay the cancel already declared for Esc, if any
                 var cancel = input.getAttribute("hx-get");
                 if (!cancel) return;
                 input.done = true;

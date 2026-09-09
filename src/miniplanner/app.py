@@ -1,4 +1,4 @@
-"""miniPlanner - un tableau minimaliste : une colonne par personne, des cartes deplacables."""
+"""miniPlanner - a minimal board: one column per person, cards you can drag around."""
 
 from flask import Flask, render_template, request
 
@@ -14,11 +14,11 @@ def create_app(**config):
     return app
 
 
-# --- lecture -----------------------------------------------------------------
+# --- reading -----------------------------------------------------------------
 
 
 def load_columns():
-    """Le tableau complet : personnes -> cartes -> lignes, deja ordonne."""
+    """The whole board: people -> cards -> lines, already ordered."""
     db = get_db()
     people = db.execute("SELECT * FROM person ORDER BY position, id").fetchall()
     cards = db.execute("SELECT * FROM card ORDER BY position, id").fetchall()
@@ -58,7 +58,7 @@ def load_card(card_id):
     return {"row": card, "lines": lines}
 
 
-# --- rendu -------------------------------------------------------------------
+# --- rendering ---------------------------------------------------------------
 
 
 def board_html(edit=None):
@@ -73,7 +73,7 @@ def column_html(person_id, edit=None):
 
 
 def stale():
-    """La ressource n'existe plus : la vue du client est perimee, on la resynchronise."""
+    """The resource is gone: the client view is stale, so resynchronise it."""
     return "", 404, {"HX-Refresh": "true"}
 
 
@@ -96,7 +96,7 @@ def register_routes(app):
     def board_fragment():
         return board_html()
 
-    # personnes / colonnes
+    # people / columns
 
     @app.get("/people/new")
     def new_person():
@@ -138,7 +138,7 @@ def register_routes(app):
     def show_column(person_id):
         return column_html(person_id) or stale()
 
-    # cartes
+    # cards
 
     @app.get("/people/<int:person_id>/cards/new")
     def new_card(person_id):
@@ -183,7 +183,7 @@ def register_routes(app):
         db.commit()
         return column_html(card["person_id"])
 
-    # lignes
+    # lines
 
     @app.post("/cards/<int:card_id>/items")
     def create_item(card_id):
@@ -195,7 +195,7 @@ def register_routes(app):
                 (card_id, text, next_position(db, "item", "card_id", card_id)),
             )
             db.commit()
-        # on rend la main a la saisie pour enchainer les lignes
+        # hand focus back to the input so lines can be typed one after another
         return card_html(card_id, edit=("add-item", card_id)) or stale()
 
     @app.get("/items/<int:item_id>/edit")
@@ -216,7 +216,7 @@ def register_routes(app):
         if text:
             db.execute("UPDATE item SET text = ? WHERE id = ?", (text, item_id))
         else:
-            # vider une ligne revient a la supprimer
+            # clearing a line deletes it
             db.execute("DELETE FROM item WHERE id = ?", (item_id,))
         db.commit()
         return card_html(item["card_id"])
@@ -231,11 +231,11 @@ def register_routes(app):
         db.commit()
         return card_html(item["card_id"])
 
-    # deplacement des cartes
+    # moving cards
 
     @app.post("/reorder")
     def reorder():
-        """Recoit l'etat complet du tableau : "personId:cardId,cardId;personId:..."."""
+        """Receives the whole board state: "personId:cardId,cardId;personId:..."."""
         db = get_db()
         for chunk in request.form.get("state", "").split(";"):
             if ":" not in chunk:

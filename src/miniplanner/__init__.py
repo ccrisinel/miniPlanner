@@ -1,4 +1,4 @@
-"""miniPlanner : qui bosse sur quoi, en un coup d'oeil."""
+"""miniPlanner: who is working on what, at a glance."""
 
 import os
 

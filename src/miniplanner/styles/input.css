@@ -11,7 +11,7 @@
     --font-mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", "Menlo", "Consolas", monospace;
 }
 
-/* carte en cours de deplacement */
+/* card being dragged */
 .card-ghost {
     opacity: 0.25;
 }
