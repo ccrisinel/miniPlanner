@@ -1,0 +1,67 @@
+{% set row = card.row %}
+<article id="card-{{ row.id }}" data-card="{{ row.id }}"
+         class="group/card relative flex min-h-36 cursor-grab flex-col rounded-2xl
+                border border-line/70 px-4 py-3 active:cursor-grabbing">
+
+    <header class="relative text-center">
+        {% if edit == ('card', row.id) %}
+            <form hx-put="/cards/{{ row.id }}" hx-target="#card-{{ row.id }}" hx-swap="outerHTML">
+                <input name="title" value="{{ row.title }}" data-autofocus data-commit autocomplete="off"
+                       hx-get="/cards/{{ row.id }}" hx-trigger="keyup[key=='Escape']"
+                       hx-target="#card-{{ row.id }}" hx-swap="outerHTML"
+                       class="w-full bg-transparent pb-1 text-center focus:outline-none">
+            </form>
+        {% else %}
+            <button hx-get="/cards/{{ row.id }}/edit"
+                    hx-target="#card-{{ row.id }}" hx-swap="outerHTML"
+                    class="inline-block max-w-full truncate px-6 pb-1 hover:text-white">{{ row.title }}</button>
+        {% endif %}
+        <span class="block border-t border-line/70"></span>
+
+        <button hx-delete="/cards/{{ row.id }}"
+                hx-target="#column-{{ row.person_id }}" hx-swap="outerHTML"
+                hx-confirm="Supprimer la carte {{ row.title }} ?"
+                aria-label="Supprimer la carte"
+                class="absolute -right-2 -top-1 flex h-7 w-7 items-center justify-center rounded text-lg leading-none text-muted opacity-0 transition hover:text-ink focus-visible:opacity-100
+                       group-hover/card:opacity-100">&times;</button>
+    </header>
+
+    <ul class="mt-3 flex flex-col gap-1 text-sm">
+        {% for item in card.lines %}
+            <li class="group/item flex items-baseline gap-2">
+                {% if edit == ('item', item.id) %}
+                    <span class="select-none text-line/60">-</span>
+                    <form hx-put="/items/{{ item.id }}"
+                          hx-target="#card-{{ row.id }}" hx-swap="outerHTML" class="flex-1">
+                        <input name="text" value="{{ item.text }}" data-autofocus data-commit autocomplete="off"
+                               hx-get="/cards/{{ row.id }}" hx-trigger="keyup[key=='Escape']"
+                               hx-target="#card-{{ row.id }}" hx-swap="outerHTML"
+                               class="w-full bg-transparent focus:outline-none">
+                    </form>
+                {% else %}
+                    <span class="select-none text-line/60">-</span>
+                    <button hx-get="/items/{{ item.id }}/edit"
+                            hx-target="#card-{{ row.id }}" hx-swap="outerHTML"
+                            class="flex-1 truncate text-left hover:text-white">{{ item.text }}</button>
+                    <button hx-delete="/items/{{ item.id }}"
+                            hx-target="#card-{{ row.id }}" hx-swap="outerHTML"
+                            aria-label="Supprimer la ligne"
+                            class="flex h-5 w-5 shrink-0 items-center justify-center
+                                   text-muted opacity-0 transition hover:text-ink
+                                   focus-visible:opacity-100
+                                   group-hover/item:opacity-100">&times;</button>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <form hx-post="/cards/{{ row.id }}/items"
+          hx-target="#card-{{ row.id }}" hx-swap="outerHTML"
+          class="mt-1 flex items-baseline gap-2 text-sm opacity-0 transition
+                 focus-within:opacity-100 group-hover/card:opacity-100">
+        <span class="select-none text-line/60">-</span>
+        <input name="text" data-commit autocomplete="off" placeholder="ajouter"
+               {% if edit == ('add-item', row.id) %}data-autofocus{% endif %}
+               class="w-full bg-transparent placeholder:text-line/40 focus:outline-none">
+    </form>
+</article>

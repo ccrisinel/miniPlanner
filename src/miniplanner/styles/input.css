@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@source "../templates";
+
+@theme {
+    --color-canvas: #141414;
+    --color-ink: #e9e7e1;
+    --color-line: #e9e7e1;
+    --color-muted: #7d7b76;
+
+    --font-mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", "Menlo", "Consolas", monospace;
+}
+
+/* carte en cours de deplacement */
+.card-ghost {
+    opacity: 0.25;
+}

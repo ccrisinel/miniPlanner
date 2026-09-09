@@ -1,0 +1,52 @@
+{% set person = column.row %}
+<section id="column-{{ person.id }}"
+         class="group/col flex min-w-72 flex-1 flex-col border-r border-line/30">
+
+    <header class="relative flex h-24 shrink-0 items-center justify-center border-b border-line/30 px-4">
+        {% if edit == ('person', person.id) %}
+            <form hx-put="/people/{{ person.id }}" hx-target="#board" hx-swap="innerHTML"
+                  class="w-full">
+                <input name="name" value="{{ person.name }}" data-autofocus data-commit autocomplete="off"
+                       hx-get="/board" hx-trigger="keyup[key=='Escape']"
+                       hx-target="#board" hx-swap="innerHTML"
+                       class="w-full bg-transparent text-center text-lg focus:outline-none">
+            </form>
+        {% else %}
+            <button hx-get="/people/{{ person.id }}/edit" hx-target="#board" hx-swap="innerHTML"
+                    class="max-w-full truncate text-lg hover:text-white">{{ person.name }}</button>
+            <button hx-delete="/people/{{ person.id }}" hx-target="#board" hx-swap="innerHTML"
+                    hx-confirm="Supprimer {{ person.name }} et toutes ses cartes ?"
+                    aria-label="Supprimer {{ person.name }}"
+                    class="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded text-lg leading-none text-muted opacity-0 transition hover:text-ink focus-visible:opacity-100
+                           group-hover/col:opacity-100">&times;</button>
+        {% endif %}
+    </header>
+
+    <div class="flex flex-1 flex-col gap-5 p-4">
+        <div data-cards="{{ person.id }}" class="flex min-h-2 flex-col gap-5">
+            {% for card in column.cards %}
+                {% include "partials/card.html" %}
+            {% endfor %}
+        </div>
+
+        {% if edit == ('new-card', person.id) %}
+            <form hx-post="/people/{{ person.id }}/cards"
+                  hx-target="#column-{{ person.id }}" hx-swap="outerHTML"
+                  class="flex h-36 flex-col rounded-2xl border border-line/70 px-4 py-3">
+                <input name="title" data-autofocus data-commit autocomplete="off" placeholder="titre"
+                       hx-get="/columns/{{ person.id }}" hx-trigger="keyup[key=='Escape']"
+                       hx-target="#column-{{ person.id }}" hx-swap="outerHTML"
+                       class="w-full bg-transparent pb-2 text-center
+                              placeholder:text-line/40 focus:outline-none">
+                <span class="border-t border-line/70"></span>
+            </form>
+        {% else %}
+            <button hx-get="/people/{{ person.id }}/cards/new"
+                    hx-target="#column-{{ person.id }}" hx-swap="outerHTML"
+                    aria-label="Ajouter une carte"
+                    class="flex h-20 w-20 shrink-0 items-center justify-center self-center
+                           rounded-2xl border border-line/40 text-line/50 transition
+                           hover:border-line/80 hover:text-ink">+</button>
+        {% endif %}
+    </div>
+</section>

@@ -1,0 +1,13 @@
+{
+  "name": "miniplanner",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "css": "tailwindcss -i src/miniplanner/styles/input.css -o src/miniplanner/static/css/app.css --minify",
+    "css:watch": "tailwindcss -i src/miniplanner/styles/input.css -o src/miniplanner/static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

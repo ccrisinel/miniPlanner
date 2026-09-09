@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>miniPlanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <script src="{{ url_for('static', filename='js/htmx.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sortable.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/board.js') }}" defer></script>
+</head>
+<body class="min-h-screen bg-canvas font-mono text-ink antialiased">
+{% block content %}{% endblock %}
+</body>
+</html>
