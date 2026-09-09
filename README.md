@@ -47,20 +47,49 @@ run `uv sync`.
 |---------------------|---------------------------|------------------------------------------------------------|
 | `MINIPLANNER_HOST`  | `0.0.0.0`                 | All interfaces; use `127.0.0.1` to restrict to the machine |
 | `MINIPLANNER_PORT`  | `5000`                    |                                                            |
-| `MINIPLANNER_DB`    | `src/instance/planner.db` | Path to the SQLite file                                    |
+| `MINIPLANNER_DB`    | `src/instance/planner.db` | Path to the SQLite file (`/data/planner.db` in Docker)     |
 | `MINIPLANNER_DEBUG` | `0`                       | `1` enables auto-reload (development)                      |
 
 By default the server listens on every interface, so colleagues can reach it over
 the local network. There are no accounts and no passwords: only expose it on a
 network you trust.
 
-### In production
+## Docker
+
+The image runs gunicorn — not the development server — as an unprivileged user:
+
+```bash
+docker compose up -d          # http://localhost:8000
+```
+
+The board lives in a `planner-data` volume mounted at `/data`; backing up means
+copying `planner.db` out of it. Without compose:
+
+```bash
+docker build -t miniplanner .
+docker run -d -p 8000:8000 -v planner-data:/data miniplanner
+```
+
+Built in two stages on `python:3.13-alpine`, the image is around 24 MB compressed
+and 37 MB on disk. It ships two gthread workers, which suits a small team; override
+the command to change that:
+
+```bash
+docker run -p 8000:8000 -v planner-data:/data miniplanner \
+  gunicorn "miniplanner:create_app()" --bind 0.0.0.0:8000 \
+  --workers 4 --worker-class gthread --threads 4
+```
+
+SQLite runs in WAL mode with a busy timeout, so several workers can share the file
+without tripping over each other.
+
+### Without Docker
 
 The built-in server is a development server. For shared use, put a real WSGI server
 in front:
 
 ```bash
-uv run --with gunicorn gunicorn "miniplanner:create_app()" -b 0.0.0.0:8000
+uv run --extra prod gunicorn "miniplanner:create_app()" -b 0.0.0.0:8000
 ```
 
 Backing up means copying the SQLite file.

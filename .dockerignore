@@ -1,0 +1,15 @@
+.git
+.gitignore
+.venv
+node_modules
+docs
+dist
+build
+*.egg-info
+__pycache__
+*.py[oc]
+*.db
+src/instance
+.python-version
+compose.yaml
+Dockerfile

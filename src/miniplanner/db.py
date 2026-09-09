@@ -1,4 +1,4 @@
-"""Stockage SQLite du planner : personnes -> cartes -> lignes."""
+"""SQLite storage for the board: people -> cards -> lines."""
 
 import os
 import sqlite3
@@ -43,9 +43,12 @@ def get_db():
     if "db" not in g:
         path = db_path(current_app)
         path.parent.mkdir(parents=True, exist_ok=True)
-        g.db = sqlite3.connect(path)
+        g.db = sqlite3.connect(path, timeout=15)
         g.db.row_factory = sqlite3.Row
         g.db.execute("PRAGMA foreign_keys = ON")
+        # Several gunicorn workers write to the same file: wait for the lock
+        # instead of failing straight away.
+        g.db.execute("PRAGMA busy_timeout = 5000")
     return g.db
 
 
@@ -58,12 +61,15 @@ def close_db(exc=None):
 def init_db(app):
     with app.app_context():
         db = get_db()
+        # WAL lets reads and writes run concurrently. The setting is stored in
+        # the file itself, so it only needs to be set once.
+        db.execute("PRAGMA journal_mode = WAL")
         db.executescript(SCHEMA)
         db.commit()
 
 
 def next_position(db, table, column, parent_id):
-    """Position suivante dans un parent donne (table/column sont des constantes internes)."""
+    """Next position within a parent (table/column are internal constants)."""
     row = db.execute(
         f"SELECT COALESCE(MAX(position), -1) + 1 AS p FROM {table} WHERE {column} = ?",
         (parent_id,),

@@ -1,0 +1,12 @@
+services:
+  miniplanner:
+    build: .
+    image: miniplanner
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - planner-data:/data
+
+volumes:
+  planner-data:
